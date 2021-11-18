@@ -19,6 +19,45 @@ router.get("/", (req, res) => {
     }
   });
 });
+// find active todos
+router.get("/active", async (req, res) => {
+  console.log("come to me");
+  const todo = new Todo();
+  const data = await todo.findActive();
+
+  res.status(200).json({
+    data,
+  });
+});
+
+router.get("/active-callback", (req, res) => {
+  const todo = new Todo();
+  todo.findActiveCallback((err, data) => {
+    if (err) {
+      res.status(500).json({
+        error: "there was an server side error",
+      });
+    } else {
+      res.status(200).json({
+        data,
+      });
+    }
+  });
+});
+// get like title statics method
+router.get("/JS", async (req, res) => {
+  const data = await Todo.findByJS();
+  res.status(200).json({
+    data,
+  });
+});
+
+router.get("/description", async (req, res) => {
+  const data = await Todo.find().byDescription("hours");
+  res.status(200).json({
+    data,
+  });
+});
 // get a single todo
 router.get("/:id", async (req, res) => {
   try {
@@ -33,6 +72,7 @@ router.get("/:id", async (req, res) => {
     });
   }
 });
+
 // create a new todo
 router.post("/", (req, res) => {
   const newTodo = new Todo(req.body);
@@ -49,6 +89,7 @@ router.post("/", (req, res) => {
     }
   });
 });
+
 // create multiple todo
 router.post("/all", (req, res) => {
   Todo.insertMany(req.body, (err, todo) => {
@@ -66,24 +107,6 @@ router.post("/all", (req, res) => {
 });
 
 router.put("/:id", async (req, res) => {
-  // try {
-  //   await Todo.updateOne(
-  //     { _id: req.params.id },
-  //     {
-  //       $set: {
-  //         status: "active",
-  //       },
-  //     }
-  //   );
-  //   res.status(200).json({
-  //     message: "data updated suscessfully",
-  //   });
-  // } catch (err) {
-  //   res.status(500).json({
-  //     error: "there was an server side error",
-  //     message: err,
-  //   });
-  // }
   try {
     const result = await Todo.findByIdAndUpdate(
       { _id: req.params.id },

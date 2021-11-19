@@ -3,9 +3,9 @@ const mongoose = require("mongoose");
 const todoSchema = require("../schemas/todoSchema");
 const router = express.Router();
 const Todo = mongoose.model("Todo", todoSchema);
-
+const checkLogin = require("../middlewares/checkLogin");
 // get all todos
-router.get("/", (req, res) => {
+router.get("/", checkLogin, (req, res) => {
   Todo.find().exec((err, data) => {
     if (err) {
       res.status(500).json({
@@ -20,7 +20,7 @@ router.get("/", (req, res) => {
   });
 });
 // find active todos
-router.get("/active", async (req, res) => {
+router.get("/active", checkLogin, async (req, res) => {
   console.log("come to me");
   const todo = new Todo();
   const data = await todo.findActive();
@@ -30,7 +30,7 @@ router.get("/active", async (req, res) => {
   });
 });
 
-router.get("/active-callback", (req, res) => {
+router.get("/active-callback", checkLogin, (req, res) => {
   const todo = new Todo();
   todo.findActiveCallback((err, data) => {
     if (err) {
@@ -59,7 +59,7 @@ router.get("/description", async (req, res) => {
   });
 });
 // get a single todo
-router.get("/:id", async (req, res) => {
+router.get("/:id", checkLogin, async (req, res) => {
   try {
     const data = await Todo.find({ _id: req.params.id });
     res.status(200).json({
@@ -74,7 +74,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // create a new todo
-router.post("/", (req, res) => {
+router.post("/", checkLogin, (req, res) => {
   const newTodo = new Todo(req.body);
   newTodo.save((err, todo) => {
     if (err) {
@@ -91,7 +91,7 @@ router.post("/", (req, res) => {
 });
 
 // create multiple todo
-router.post("/all", (req, res) => {
+router.post("/all", checkLogin, (req, res) => {
   Todo.insertMany(req.body, (err, todo) => {
     if (err) {
       res.status(500).json({
@@ -106,7 +106,7 @@ router.post("/all", (req, res) => {
   });
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", checkLogin, async (req, res) => {
   try {
     const result = await Todo.findByIdAndUpdate(
       { _id: req.params.id },
@@ -132,7 +132,7 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", checkLogin, (req, res) => {
   Todo.deleteOne({ _id: req.params.id }, (err) => {
     if (err) {
       res.status(500).json({

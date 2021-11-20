@@ -1,9 +1,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const router = express.Router();
 const jwt = require("jsonwebtoken");
 const userSchema = require("../schemas/userSchema");
-const router = express.Router();
 const User = mongoose.model("User", userSchema);
 
 // create new user
@@ -61,6 +61,14 @@ router.post("/login", async (req, res) => {
       error: err.message,
     });
   }
+});
+
+router.get("/all", async (req, res) => {
+  const user = await User.find().populate("todos");
+  res.status(200).json({
+    status: "Success",
+    data: user,
+  });
 });
 
 module.exports = router;
